@@ -1,0 +1,15 @@
+REGISTER /home/edureka/SAIWS/batch191216/JobJars/PigUDF.jar;
+
+A = LOAD '/home/edureka/SAIWS/Dataset/PIG/Class_4_Usecase/healthcare_Sample_dataset2.csv' using PigStorage(',') AS (PatientID: int, Name: chararray, DOB: chararray, PhoneNumber: chararray, EmailAddress: chararray, SSN: chararray, Gender: chararray, Disease: chararray, weight: float);
+
+B = LOAD '/home/edureka/SAIWS/Dataset/PIG/Class_4_Usecase/healthcare_Sample_dataset1.csv' using PigStorage(',') AS (PatientID: int, Name: chararray, DOB: chararray, PhoneNumber: chararray, EmailAddress: chararray, SSN: chararray, Gender: chararray, Disease: chararray, weight: float);
+
+U = UNION A, B;
+
+C = LIMIT U 100;
+
+DEFINE to_deidentify com.test.deidentify.DeIdentifyUDF();
+
+D = FOREACH C GENERATE PatientID, to_deidentify(Name,'12345678abcdefgh'), com.test.deidentify.DeIdentifyUDF(DOB,'12345678abcdefgh'), com.test.deidentify.DeIdentifyUDF(PhoneNumber,'12345678abcdefgh'), com.test.deidentify.DeIdentifyUDF(EmailAddress,'12345678abcdefgh'),com.test.deidentify.DeIdentifyUDF(SSN,'12345678abcdefgh'), com.test.deidentify.DeIdentifyUDF(Disease,'12345678abcdefgh'),weight;
+
+STORE D into '/home/edureka/SAIWS/Dataset/PIG/Class_4_Usecase/deidentifiedDir';
